@@ -1,0 +1,4 @@
+*.idea
+
+
+../services/frontend/node_modules/

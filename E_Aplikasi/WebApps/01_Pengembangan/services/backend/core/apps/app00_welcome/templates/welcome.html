@@ -1,0 +1,49 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Welcome</title>
+    <!-- Menambahkan Favicon -->
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <style>
+        .gambarHover {
+            display: block;
+            background-image: url("{% static 'images/AIr_Logo_02.png' %}");
+            width: 600px;
+            height: 600px;
+            background-size: cover;
+        }
+
+        .gambarHover:hover {
+            background-image: url("{% static 'images/AIr_Logo_01.jpg' %}");
+            width: 600px;
+            height: 600px;
+            background-size: cover;
+        }
+
+        .tombolHover:hover {
+            background-color: dodgerblue;
+            color: white; /* Ganti warna teks saat hover jika perlu */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Selamat Datang AIr !!!</h1>
+    <br>
+    <a href="{% url 'home' %}">
+        <div class="gambarHover"></div>
+    </a>
+    <br>
+    <h2>Mari merancang aplikasi web</h2>
+    <br>
+    <a href="{% url 'regs' %}" class="btn btn-secondary tombolHover">Regs</a>
+</div>
+<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

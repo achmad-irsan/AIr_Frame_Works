@@ -1,0 +1,85 @@
+#===============
+# IDEs & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.gitignore
+.dockerignore
+.gitattributes
+
+#===============
+database/
+env/
+
+
+#===============
+# domain backend
+# File
+__init__.py
+manage.py
+
+# Folder
+__pycache__/
+venv/
+admin/
+bootstrap/
+static/
+media/
+
+
+#===============
+# domain frontend
+# dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Yarn Berry Cache and Unplugged
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# Temp Files
+*.temp
+*.tmp
+.pnp.*
+
+
+#===============
+#Penyesuaian untuk tetap dipantau
+# domain backend
+!services/backend/air/
+!services/backend/api/
+!services/ackend/apps/
+!services/backend/attachment/
+!services//backend/templates/
+
+# domain frontend
+!services/frontend/public/
+!services/frontend/src/
+!services/frontend/README.md
+!services/frontend/package.json
+!services/frontend/package-lock.json
+
+
+#===============
+

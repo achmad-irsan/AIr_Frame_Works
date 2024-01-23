@@ -1,0 +1,44 @@
+# Update 20240118
+
+# CORE PACK
+markdown==3.5.1
+
+#=====================================
+# MODELING PACK
+# Rhinoceros3D
+rhino3dm == 8.0.1
+Rhino-stubs == 7.7.21140
+# compute-rhino3d == 0.12.2
+# rhinoinside == 0.6.0
+
+# Grasshopper3D
+# Grasshopper-stubs == 7.7.21140
+# GH-Util-stubs == 7.7.21140
+# GH-IO-stubs == 7.7.21140
+# Eto-stubs == 2.5.2
+
+# ArchiCad
+# archicad == 27.3000
+# tapir-py == 1.0.0
+
+# IFC
+# ifcopenshell == 0.7.0.231218
+# compas-ifc == 0.2.0
+
+#PythonNet
+pythonnet==3.0.3
+
+# Data Processing
+pandas3 == 0.0.1
+# scikit-learn == 1.3.2
+plotly == 5.18.0
+matplotlib == 3.8.2
+
+# Image Processing
+# opencv-python == 4.9.0.80
+
+# AI ML DL
+# keras == 3.0.2 # Disable pilihan ini jika ingin menginstall TensorFlow
+# tensorflow == 2.15.0 # Keras sudah integrated dalam Tensorflow
+
+

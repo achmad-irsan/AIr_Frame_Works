@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  backend:
+    image: airsanaini/backend:1.0.0
+    #stdin_open: true
+    #tty: true
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=air.settings
+    #depends_on:
+
+#networks:
+

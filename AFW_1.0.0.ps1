@@ -1,11 +1,65 @@
-# Cek path temporari untuk menyimpan hasil unduhan
+#Invoke-WebRequest -Uri https://api.github.com/repos/achmad-irsan/AIr_Frame_Works/releases/latest
+
+# Menarik keterangan info rilis
+$response = Invoke-WebRequest -Uri https://api.github.com/repos/achmad-irsan/AIr_Frame_Works/releases/latest
+$InfoRilis = $response.Content | ConvertFrom-Json
+
+# Nama software menggunakan variabel $InfoRilis.name
+# Tag versi software dalam format "0.0.0" menggunakan variabel $InfoRilis.tag_name
+# Dalam format "dd/mm/yyyy hh:mn:ss" tergantung pengaturan region di sistem lokal, namun posisi string yyyy biasanya tetap (baik untuk format INA maupun Eng-USA) menggunakan variabel $InfoRilis.published_at
+
+# Nama Pengembang
+$PengembangSoftware = "Achmad Irsan"
+# Memecah string berdasarkan '/' dan ' '
+$WaktuRilis = $InfoRilis.published_at -split '[/ ]'
+# Seleksi string tanggal dan tahun
+$TanggalRilis = $WaktuRilis[0..2] -join '/'
+$TahunRilis = $WaktuRilis[2]
+
+# Lisensi Software
+Write-Host " "
+Write-Host "Nama pengembang : " $PengembangSoftware
+Write-Host "Nama            : " $InfoRilis.name
+Write-Host "Versi           : " $InfoRilis.tag_name
+Write-Host "Tanggal rilis   : " $TanggalRilis
+Write-Host "Deskripsi       : " $InfoRilis.body
+Write-Host "
+"
+
+Write-Host "MIT License
+Copyright (c) [$TahunRilis] [$PengembangSoftware]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"
+
+
+$UrlGitHub = "https://github.com/achmad-irsan/AIr_Frame_Works/archive/refs/tags/$($InfoRilis.tag_name).zip"
+try {
+    # Mengirim permintaan ke URL
+    $response = Invoke-WebRequest -Uri $UrlGitHub -Method Head -ErrorAction Stop
+    # Jika tidak ada eksepsi dan mendapat respons, maka link aktif
+    Write-Host "Link aktif, Status Code: $($response.StatusCode)"
+}
+catch {
+    # Menangkap eksepsi jika permintaan gagal
+    Write-Host "Link tidak aktif atau terjadi kesalahan. Detail: $($_.Exception.Message)"
+}
+
+
+#======================================================================
+# Cek path temporari untuk menyimpan hasil unduhan atau membuat folder .temp baru
 if (-not (Test-Path "C:\.temp")) {
     New-Item -ItemType Directory -Path "C:\.temp"
 }
 
+
+#======================================================================
 # Unduh sistem direktori dari github
-$UrlGithub = "https://github.com/achmad-irsan/TPL_Project_Setup/archive/refs/heads/main.zip"
-$PathSimpan = "C:\.temp\TPL_Project_Setup.zip"
+$PathSimpan = "C:\.temp\AIr_Frame_Works-$VersiSkrip.zip"
 
 Invoke-WebRequest -Uri $UrlGithub -OutFile $PathSimpan
 
@@ -14,7 +68,7 @@ $PathEkstrak = "C:\.temp"
 Expand-Archive -LiteralPath $PathSimpan -DestinationPath $PathEkstrak -Force
 
 # Path sumber folder .airicon
-$PathIcon = "C:\.temp\TPL_Project_Setup-main\etc\.airicon"
+$PathIcon = "C:\.temp\AIr_Frame_Works-$VersiSkrip\etc\.airicon"
 
 # Path tujuan ke direktori home user
 $PathSalinIcon = "C:\Users\Public"
@@ -23,6 +77,7 @@ $PathSalinIcon = "C:\Users\Public"
 Copy-Item -Path $PathIcon -Destination $PathSalinIcon -Recurse -Force
 
 
+#======================================================================
 # Fungsi untuk memvalidasi nama proyek
 function Get-ValidasiInput($InisialProyek) {
     return $InisialProyek -match '^[A-Z0-9]{4}$'
@@ -69,7 +124,7 @@ Menggunakan direktori yang sudah ada di lokasi: $PathProyek
 Direktori baru '$NamaDir' telah dibuat di lokasi: $PathProyek
     "
 }
-#================================================================================
+#======================================================================
 
 # Fungsi untuk mendapatkan pilihan domain dari pengguna
 function Get-PilihanDomain {
@@ -199,7 +254,7 @@ $MappingDir = @{
 }
 
 # Sumber folder hasil ekstraksi di C:\.temp\
-$SumberDirektori = "C:\.temp\TPL_Project_Setup-main"
+$SumberDirektori = "C:\.temp\AIr_Frame_Works-$VersiSkrip"
 
 # Selalu pindahkan folder 'etc'
 Copy-Item -Path "$SumberDirektori\etc" -Destination $PathProyek -Recurse -Force
@@ -229,16 +284,13 @@ if (Test-Path "$PathProyek\E_Aplikasi\WebApps\01_Pengembangan\.gitignore.bak") {
 }
 
 
-
-
 Write-Host "
 Berikut susunan direktori kerja anda:"
 
 cd .\$NamaDir
 ls
 
-Remove-Item -Path "C:\.temp" -Recurse -Force
-
+#======================================================================
 # Merubah icon direktori
 # Lokasi root dari struktur folder Anda berdasarkan lokasi script PowerShell
 $PathInduk = $PSScriptRoot
@@ -247,57 +299,66 @@ $PathInduk = $PSScriptRoot
 $PathSumberIcon = "C:\Users\Public\.airicon"
 
 # Mendefinisikan nama folder dan ikon yang sesuai
-$DirIcon = @{
-    "Project_$inisialProyek" = Join-Path $PathSumberIcon "air_01.ico"
-    "01_Diproses" = Join-Path $PathSumberIcon "01.ico"
-    "02_Dibagikan" = Join-Path $PathSumberIcon "02.ico"
-    "03_Diarsipkan" = Join-Path $PathSumberIcon "03.ico"
-    "04_Diterbitkan" = Join-Path $PathSumberIcon "04.ico"
-    "01_Pengembangan" = Join-Path $PathSumberIcon "01.ico"
-    "02_Pengujian" = Join-Path $PathSumberIcon "02.ico"
-    "03_Pengarsipan" = Join-Path $PathSumberIcon "03.ico"
-    "04_Produksi" = Join-Path $PathSumberIcon "04.ico"
-}
-
-# Fungsi untuk mengganti ikon folder
-function Set-FolderIcon {
-    param (
-        [string]$PathDirKerja,
-        [string]$PathIconKerja
-    )
-    $desktopIniPath = Join-Path $PathDirKerja "desktop.ini"
-
-    # Mengatur atribut folder dan file desktop.ini
-    Set-ItemProperty -Path $PathDirKerja -Name Attributes -Value "ReadOnly"
-    if (Test-Path $desktopIniPath) {
-        Set-ItemProperty -Path $desktopIniPath -Name Attributes -Value "Normal"
-    }
-
-    # Membuat atau mengedit isi desktop.ini
-    "[.ShellClassInfo]" > $desktopIniPath
-    "IconResource=$PathIconKerja,0" >> $desktopIniPath
-
-    # Mengatur kembali atribut file desktop.ini
-    Set-ItemProperty -Path $desktopIniPath -Name Attributes -Value "Hidden,System"
-    Set-ItemProperty -Path $PathDirKerja -Name Attributes -Value "ReadOnly,System"
-}
-
-# Melakukan pencarian folder dan mengganti ikon
-foreach ($folderName in $DirIcon.Keys) {
-    $PathIconKerja = $DirIcon[$folderName]
-    $folders = Get-ChildItem -Path $PathInduk -Recurse -Directory -Filter $folderName
-    foreach ($folder in $folders) {
-        Set-FolderIcon -PathDirKerja $folder.FullName -PathIconKerja $PathIconKerja
-    }
-}
+#$DirIcon = @{
+#    "Project_$inisialProyek" = Join-Path $PathSumberIcon "air_01.ico"
+#    "01_Diproses" = Join-Path $PathSumberIcon "01.ico"
+#    "02_Dibagikan" = Join-Path $PathSumberIcon "02.ico"
+#    "03_Diarsipkan" = Join-Path $PathSumberIcon "03.ico"
+#    "04_Diterbitkan" = Join-Path $PathSumberIcon "04.ico"
+#    "01_Pengembangan" = Join-Path $PathSumberIcon "01.ico"
+#    "02_Pengujian" = Join-Path $PathSumberIcon "02.ico"
+#    "03_Pengarsipan" = Join-Path $PathSumberIcon "03.ico"
+#    "04_Produksi" = Join-Path $PathSumberIcon "04.ico"
+#}
+#
+## Fungsi untuk mengganti ikon folder
+#function Set-FolderIcon {
+#    param (
+#        [string]$PathDirKerja,
+#        [string]$PathIconKerja
+#    )
+#    $desktopIniPath = Join-Path $PathDirKerja "desktop.ini"
+#
+#    # Mengatur atribut folder dan file desktop.ini
+#    Set-ItemProperty -Path $PathDirKerja -Name Attributes -Value "ReadOnly"
+#    if (Test-Path $desktopIniPath) {
+#        Set-ItemProperty -Path $desktopIniPath -Name Attributes -Value "Normal"
+#    }
+#
+#    # Membuat atau mengedit isi desktop.ini
+#    "[.ShellClassInfo]" > $desktopIniPath
+#    "IconResource=$PathIconKerja,0" >> $desktopIniPath
+#
+#    # Mengatur kembali atribut file desktop.ini
+#    Set-ItemProperty -Path $desktopIniPath -Name Attributes -Value "Hidden,System"
+#    Set-ItemProperty -Path $PathDirKerja -Name Attributes -Value "ReadOnly,System"
+#}
+#
+## Melakukan pencarian folder dan mengganti ikon
+#foreach ($folderName in $DirIcon.Keys) {
+#    $PathIconKerja = $DirIcon[$folderName]
+#    $folders = Get-ChildItem -Path $PathInduk -Recurse -Directory -Filter $folderName
+#    foreach ($folder in $folders) {
+#        Set-FolderIcon -PathDirKerja $folder.FullName -PathIconKerja $PathIconKerja
+#    }
+#}
 
 # Opsional: Restart Windows Explorer untuk melihat perubahan
 #Stop-Process -Name explorer -Force
 #Start-Process explorer
 
+#======================================================================
+# Menghapus folder temporari
+Remove-Item -Path "C:\.temp" -Recurse -Force
 
+# Membuat log
+$PathLog = "$PathSalinIcon\.airicon"
+# Membuat log dan menimpa file jika sudah ada
+Get-Process > "$PathLog\afwlog.txt"
+# Membuat log dan menambahkan ke file jika sudah ada
+Get-Process >> "$PathLog\afwlog.txt"
 
-
+#======================================================================
 Write-Host "
 Selamat, anda sukses melakukan pengaturan direktori kerja...
 Selamat bekerja dan jangan lupa bahagia

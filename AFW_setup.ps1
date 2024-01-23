@@ -1,5 +1,3 @@
-#Invoke-WebRequest -Uri https://api.github.com/repos/achmad-irsan/AIr_Frame_Works/releases/latest
-
 # Menarik keterangan info rilis
 $response = Invoke-WebRequest -Uri https://api.github.com/repos/achmad-irsan/AIr_Frame_Works/releases/latest
 $InfoRilis = $response.Content | ConvertFrom-Json
@@ -53,27 +51,24 @@ catch {
 #======================================================================
 # Cek path temporari untuk menyimpan hasil unduhan atau membuat folder .temp baru
 if (-not (Test-Path "C:\.temp")) {
-    New-Item -ItemType Directory -Path "C:\.temp"
+    New-Item -ItemType Directory -Path "C:\.temp" -Force -ErrorAction SilentlyContinue | Out-Null
 }
 
-
-#======================================================================
-# Unduh sistem direktori dari github
-$PathSimpan = "C:\.temp\AIr_Frame_Works-$VersiSkrip.zip"
-
-Invoke-WebRequest -Uri $UrlGithub -OutFile $PathSimpan
+# Menentukan path hasil unduhan dan menunduh dari sumber github
+$PathSimpan = "C:\.temp\AIr_Frame_Works-$($InfoRilis.tag_name).zip"
+Invoke-WebRequest -Uri $UrlGithub -OutFile $PathSimpan -ErrorAction SilentlyContinue
 
 # Melakukan ekstraksi hasil unduhan
 $PathEkstrak = "C:\.temp"
 Expand-Archive -LiteralPath $PathSimpan -DestinationPath $PathEkstrak -Force
 
-# Path sumber folder .airicon
-$PathIcon = "C:\.temp\AIr_Frame_Works-$VersiSkrip\etc\.airicon"
 
-# Path tujuan ke direktori home user
+#======================================================================
+# Menentukan path sumber ikon dari hasil ekstraksi
+$PathIcon = "C:\.temp\AIr_Frame_Works-$($InfoRilis.tag_name)\etc\.airicon"
+# Menentukan path untuk menyimpan folder ikon .airicon
 $PathSalinIcon = "C:\Users\Public"
-
-# Salin folder .airicon ke direktori home user
+# Salin folder .airicon dari path hasil ekstraksi ke direktori penyimpanan baru
 Copy-Item -Path $PathIcon -Destination $PathSalinIcon -Recurse -Force
 
 
@@ -91,7 +86,8 @@ Silahkan memasukkan 4 digit untuk inisial nama Proyek (XXXX)"
 while (-not (Get-ValidasiInput $InisialProyek)) {
     Write-Host "
     !! Maaf, input tidak valid.
-    Pastikan Anda memasukkan 4 digit dengan format kombinasi angka-huruf kapital atau huruf kapital.
+    Pastikan Anda memasukkan 4 digit dengan format kombinasi angka-huruf kapital
+    atau huruf kapital.
     "
     $InisialProyek = Read-Host "Silahkan memasukkan kembali 4 digit untuk inisial nama Proyek (XXXX)"
 }
@@ -109,33 +105,38 @@ if (Test-Path $PathProyek) {
     Apakah anda sudah yakin? (Y/N)"
     if ($ResponUser.ToLower() -eq 'y') {
         Remove-Item -Path $PathProyek -Recurse -Force
-        New-Item -ItemType Directory -Path $PathProyek
+        New-Item -ItemType Directory -Path $PathProyek -Force -ErrorAction SilentlyContinue | Out-Null
         Write-Host "
-Direktori baru '$NamaDir' telah dibuat di lokasi: $PathProyek
+Direktori baru '$NamaDir' telah dibuat di lokasi:
+$PathProyek
         "
     } else {
         Write-Host "
-Menggunakan direktori yang sudah ada di lokasi: $PathProyek
+Akan dilanjutkan menggunakan direktori yang sudah ada di lokasi:
+$PathProyek
         "
     }
 } else {
-    New-Item -ItemType Directory -Path $PathProyek
+    New-Item -ItemType Directory -Path $PathProyek -Force -ErrorAction SilentlyContinue | Out-Null
     Write-Host "
 Direktori baru '$NamaDir' telah dibuat di lokasi: $PathProyek
     "
 }
-#======================================================================
 
+
+#======================================================================
 # Fungsi untuk mendapatkan pilihan domain dari pengguna
 function Get-PilihanDomain {
     do {
-        $InputUser = Read-Host "Berikutnya, silahkan menentukan domain kerja sesuai penugasan dengan memasukkan minimal salah satu atau beberapa nomor (pisahkan dengan koma untuk pilihan beberapa nomor, contoh : 1,2,3 dst):
-    1. Domain Konsep
-    2. Domain Perencanaan
-    3. Domain Perancangan
-    4. Domain Simulasi
-    5. Domain Aplikasi
-    "
+        $InputUser = Read-Host "Berikutnya, silahkan menentukan Subdomain kerja sesuai penugasan dengan memasukkan minimal salah satu atau beberapa nomor (pisahkan dengan koma untuk pilihan beberapa nomor, contoh : 1,2,3 dst):
+    1. Subdomain Konsep
+    2. Subdomain Perencanaan
+    3. Subdomain Perancangan
+    4. Subdomain Simulasi
+    5. Subdomain Aplikasi
+
+    Jawaban anda"
+        Write-Host " "
 
         # Memisahkan input pengguna dan mengonversinya menjadi array
         $PilihanDomain = $InputUser.Split(',') |
@@ -170,7 +171,7 @@ function Get-PilihanDomain {
             !! Maaf, terdapat pilihan yang tidak valid dan duplikasi.
             Pilihan yang tidak valid: $($PilihanTidakValidUnik -join ', '),
             dan pilihan duplikat: $($DuplikatNomor -join ', ').
-            Silahkan kembali memilih domain kerja anda sesuai daftar yang tersedia
+            Silahkan kembali memilih Subdomain kerja anda sesuai daftar yang tersedia
             "
             continue
         }
@@ -179,7 +180,7 @@ function Get-PilihanDomain {
         if ($PilihanValid.Length -eq 0 -and $PilihanTidakValid.Length -eq 0) {
             Write-Host "
             !! Maaf, anda belum melakukan pilihan,
-            silahkan kembali memilih domain kerja anda sesuai daftar yang tersedia
+            silahkan kembali memilih Subdomain kerja anda sesuai daftar yang tersedia
             "
             continue
         }
@@ -188,7 +189,7 @@ function Get-PilihanDomain {
         if ($PilihanTidakValid.Length -eq 1 -and $PilihanDomain.Length -eq 1) {
             Write-Host "
             !! Maaf, pilihan anda nomor: $PilihanTidakValid tidak tersedia di dalam daftar,
-            silahkan kembali memilih domain kerja anda sesuai daftar yang tersedia
+            silahkan kembali memilih Subdomain kerja anda sesuai daftar yang tersedia
             "
             continue
         }
@@ -206,7 +207,7 @@ function Get-PilihanDomain {
         if ($PilihanValid.Length -gt 5) {
             Write-Host "
             !! Maaf, terdapat duplikasi pilihan, yaitu pilihan nomor: $($DuplikatNomor -join ', '),
-            silahkan memilih kembali domain kerja anda sesuai daftar yang tersedia
+            silahkan memilih kembali Subdomain kerja anda sesuai daftar yang tersedia
             "
             continue
         }
@@ -215,7 +216,7 @@ function Get-PilihanDomain {
          if ($Duplikasi) {
              Write-Host "
              !! Maaf, terdapat duplikasi pilihan, yaitu pilihan nomor: $($DuplikatNomor -join ', '),
-             silahkan memilih kembali domain kerja anda sesuai daftar yang tersedia
+             silahkan memilih kembali Subdomain kerja anda sesuai daftar yang tersedia
              "
              continue
          }
@@ -229,20 +230,25 @@ function Get-PilihanDomain {
 $HasilPilihan = Get-PilihanDomain
 
 # Menampilkan pesan berdasarkan pilihan
-Write-Host
-"Anda memilih:"
+Write-Host "
+Anda memilih:"
 foreach ($Pilihan in $HasilPilihan) {
     switch ($Pilihan) {
-        "1" { Write-Host "Domain Konsep" }
-        "2" { Write-Host "Domain Perencanaan" }
-        "3" { Write-Host "Domain Perancangan" }
-        "4" { Write-Host "Domain Simulasi" }
-        "5" { Write-Host "Domain Aplikasi" }
+        "1" { Write-Host "Subdomain Konsep" }
+        "2" { Write-Host "Subdomain Perencanaan" }
+        "3" { Write-Host "Subdomain Perancangan" }
+        "4" { Write-Host "Subdomain Simulasi" }
+        "5" { Write-Host "Subdomain Aplikasi" }
     }
 }
 
 Write-Host "
 Terimakasih, kita lanjutkan pengaturan direktori kerja"
+
+
+#======================================================================
+# Sumber folder hasil ekstraksi di C:\.temp\
+$SumberDirektori = "C:\.temp\AIr_Frame_Works-$($InfoRilis.tag_name)"
 
 # Mapping folder
 $MappingDir = @{
@@ -253,23 +259,20 @@ $MappingDir = @{
     5 = "E_Aplikasi";
 }
 
-# Sumber folder hasil ekstraksi di C:\.temp\
-$SumberDirektori = "C:\.temp\AIr_Frame_Works-$VersiSkrip"
-
-# Selalu pindahkan folder 'etc'
+# Selalu menyalin folder 'etc'
 Copy-Item -Path "$SumberDirektori\etc" -Destination $PathProyek -Recurse -Force
 
-# Selalu pindahkan file dekstop.ini
+# Selalu menyalin file dekstop.ini
 Copy-Item -Path "$SumberDirektori\desktop.ini" -Destination $PathProyek -Recurse -Force
 
+# Menyalin direktori sesuai pilihan subdomain kerja
 foreach ($Pilihan in $HasilPilihan) {
-    $DirDikopi = $MappingDir[$Pilihan]
-    if (Test-Path "$SumberDirektori\$DirDikopi") {
-        Copy-Item -Path "$SumberDirektori\$DirDikopi" -Destination $PathProyek -Recurse -Force
-        Write-Host "Direktori $DirDikopi telah disiapkan."
+    $DirSalinan = $MappingDir[$Pilihan]
+    if (Test-Path "$SumberDirektori\$DirSalinan") {
+        Copy-Item -Path "$SumberDirektori\$DirSalinan" -Destination $PathProyek -Recurse -Force
+        Write-Host "Direktori $DirSalinan telah disiapkan."
     }
 }
-
 
 # Pengaturan file .gitignore
 # Mengganti nama .gitignore.bak menjadi .gitignore
@@ -290,73 +293,70 @@ Berikut susunan direktori kerja anda:"
 cd .\$NamaDir
 ls
 
+
 #======================================================================
-# Merubah icon direktori
-# Lokasi root dari struktur folder Anda berdasarkan lokasi script PowerShell
+# Menentukan lokasi root dari struktur folder Anda berdasarkan lokasi script PowerShell
 $PathInduk = $PSScriptRoot
 
-# Lokasi penyimpanan ikon
-$PathSumberIcon = "C:\Users\Public\.airicon"
+# Lokasi penyimpanan ikon di sistem lokal
+$PathSumberIcon = "$PathSalinIcon\.airicon"
 
 # Mendefinisikan nama folder dan ikon yang sesuai
-#$DirIcon = @{
-#    "Project_$inisialProyek" = Join-Path $PathSumberIcon "air_01.ico"
-#    "01_Diproses" = Join-Path $PathSumberIcon "01.ico"
-#    "02_Dibagikan" = Join-Path $PathSumberIcon "02.ico"
-#    "03_Diarsipkan" = Join-Path $PathSumberIcon "03.ico"
-#    "04_Diterbitkan" = Join-Path $PathSumberIcon "04.ico"
-#    "01_Pengembangan" = Join-Path $PathSumberIcon "01.ico"
-#    "02_Pengujian" = Join-Path $PathSumberIcon "02.ico"
-#    "03_Pengarsipan" = Join-Path $PathSumberIcon "03.ico"
-#    "04_Produksi" = Join-Path $PathSumberIcon "04.ico"
-#}
-#
-## Fungsi untuk mengganti ikon folder
-#function Set-FolderIcon {
-#    param (
-#        [string]$PathDirKerja,
-#        [string]$PathIconKerja
-#    )
-#    $desktopIniPath = Join-Path $PathDirKerja "desktop.ini"
-#
-#    # Mengatur atribut folder dan file desktop.ini
-#    Set-ItemProperty -Path $PathDirKerja -Name Attributes -Value "ReadOnly"
-#    if (Test-Path $desktopIniPath) {
-#        Set-ItemProperty -Path $desktopIniPath -Name Attributes -Value "Normal"
-#    }
-#
-#    # Membuat atau mengedit isi desktop.ini
-#    "[.ShellClassInfo]" > $desktopIniPath
-#    "IconResource=$PathIconKerja,0" >> $desktopIniPath
-#
-#    # Mengatur kembali atribut file desktop.ini
-#    Set-ItemProperty -Path $desktopIniPath -Name Attributes -Value "Hidden,System"
-#    Set-ItemProperty -Path $PathDirKerja -Name Attributes -Value "ReadOnly,System"
-#}
-#
-## Melakukan pencarian folder dan mengganti ikon
-#foreach ($folderName in $DirIcon.Keys) {
-#    $PathIconKerja = $DirIcon[$folderName]
-#    $folders = Get-ChildItem -Path $PathInduk -Recurse -Directory -Filter $folderName
-#    foreach ($folder in $folders) {
-#        Set-FolderIcon -PathDirKerja $folder.FullName -PathIconKerja $PathIconKerja
-#    }
-#}
+$DirIcon = @{
+    "Project_$inisialProyek" = Join-Path $PathSumberIcon "air_01.ico"
+    "01_Diproses" = Join-Path $PathSumberIcon "01.ico"
+    "02_Dibagikan" = Join-Path $PathSumberIcon "02.ico"
+    "03_Diarsipkan" = Join-Path $PathSumberIcon "03.ico"
+    "04_Diterbitkan" = Join-Path $PathSumberIcon "04.ico"
+    "01_Pengembangan" = Join-Path $PathSumberIcon "01.ico"
+    "02_Pengujian" = Join-Path $PathSumberIcon "02.ico"
+    "03_Pengarsipan" = Join-Path $PathSumberIcon "03.ico"
+    "04_Produksi" = Join-Path $PathSumberIcon "04.ico"
+}
+
+# Fungsi untuk mengganti ikon folder
+function Set-FolderIcon {
+    param (
+        [string]$PathDirKerja,
+        [string]$PathIconKerja
+    )
+    $PathDesktopIni = Join-Path $PathDirKerja "desktop.ini"
+
+    # Mengatur atribut folder dan file desktop.ini
+    Set-ItemProperty -Path $PathDirKerja -Name Attributes -Value "ReadOnly"
+    if (Test-Path $PathDesktopIni) {
+        Set-ItemProperty -Path $PathDesktopIni -Name Attributes -Value "Normal"
+    }
+
+    # Pengaturan skrip desktop.ini
+    "[.ShellClassInfo]" > $PathDesktopIni
+    "IconResource=$PathIconKerja,0" >> $PathDesktopIni
+
+    # Mengatur kembali atribut file desktop.ini
+    Set-ItemProperty -Path $PathDesktopIni -Name Attributes -Value "Hidden,System"
+    Set-ItemProperty -Path $PathDirKerja -Name Attributes -Value "ReadOnly,System"
+}
+
+# Melakukan pencarian folder dan mengganti ikon
+foreach ($NamaFolder in $DirIcon.Keys) {
+    $PathIconKerja = $DirIcon[$NamaFolder]
+    $folders = Get-ChildItem -Path $PathInduk -Recurse -Directory -Filter $NamaFolder
+    foreach ($folder in $folders) {
+        Set-FolderIcon -PathDirKerja $folder.FullName -PathIconKerja $PathIconKerja
+    }
+}
 
 # Opsional: Restart Windows Explorer untuk melihat perubahan
 #Stop-Process -Name explorer -Force
 #Start-Process explorer
 
+
 #======================================================================
-# Menghapus folder temporari
+# Menghapus folder temporari (sementara)
 Remove-Item -Path "C:\.temp" -Recurse -Force
 
 # Membuat log
-$PathLog = "$PathSalinIcon\.airicon"
-# Membuat log dan menimpa file jika sudah ada
-Get-Process > "$PathLog\afwlog.txt"
-# Membuat log dan menambahkan ke file jika sudah ada
-Get-Process >> "$PathLog\afwlog.txt"
+
 
 #======================================================================
 Write-Host "
@@ -366,4 +366,3 @@ salam sukses
 AIrsan."
 Read-Host "
 Tekan Enter untuk keluar..."
-

@@ -293,6 +293,9 @@ Berikut susunan direktori kerja anda:"
 cd .\$NamaDir
 ls
 
+Write-Host "
+Mohon ditunggu hingga instalasi selesai ..."
+
 
 #======================================================================
 # Menentukan lokasi root dari struktur folder Anda berdasarkan lokasi script PowerShell

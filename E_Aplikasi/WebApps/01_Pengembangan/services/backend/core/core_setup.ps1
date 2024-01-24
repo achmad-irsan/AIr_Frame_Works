@@ -43,7 +43,7 @@ $PathInduk = $PSScriptRoot
 # Tentukan versi Python yang diinginkan
 $TargetVersiPython = "3.11"
 
-# Pengaturan instalasi Python
+# SETUP PYTHON
 function Get-InstallPython {
 
     # Tentukan URL installer Python
@@ -52,12 +52,12 @@ function Get-InstallPython {
     # Tentukan lokasi tempat menyimpan file installer
     $PathInstaller = "C:\.temp\python_installer.exe"
 
-    # Buat direktori .temp jika belum ada
+    # Buat direktori temp jika belum ada
     if (-not (Test-Path "C:\.temp")) {
-    New-Item -ItemType Directory -Path "C:\.temp" -Force -ErrorAction SilentlyContinue | Out-Null
+    New-Item -ItemType Directory -Path "C:\.temp"
     }
     # Unduh installer
-    Invoke-WebRequest -Uri $UrlInstallerPython -OutFile $PathInstaller -ErrorAction SilentlyContinue
+    Invoke-WebRequest -Uri $UrlInstallerPython -OutFile $PathInstaller
 
     # Jalankan installer
     Start-Process $PathInstaller -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1' -Wait
@@ -68,9 +68,9 @@ function Get-InstallPython {
 
 # Pengaturan Lingkungan Virtual Python
 function Get-SetupVenv {
-    py -3.11 -m venv venvrh311
+    py -3.11 -m venv venv
 
-    .\venvrh311\Scripts\activate
+    .\venv\Scripts\activate
 
     python -m pip install pip --upgrade
 
@@ -102,36 +102,24 @@ Read-Host "
 $PythonTerinstall = py -0 | Out-String
 
 if ($PythonTerinstall -like "*$TargetVersiPython*") {
-    Write-Host "
-    Selamat, Python $TargetVersiPython sudah terinstall pada system global anda,
-    mari kita lanjutkan menginstall lingkungan virtual.
-    Mohon tunggu beberapa saat hingga proses selesai ...
-    "
+    Write-Host "Selamat, Python $TargetVersiPython sudah terinstall pada system global anda, kita lanjutkan menginstall lingkungan virtual. Mohon tunggu beberapa saat hingga proses selesai ...
+     "
 
 }
 else
 {
-    $PesanSistem = Read-Host "
-    Sistem global anda belum memiliki python versi $TargetVersiPython,
-    Apakah anda mau melanjutkan instalasi python versi tersebut? (Y/N)
-    "
+    $PesanSistem = Read-Host "Sistem global anda belum memiliki python versi $TargetVersiPython, Apakah anda mau melanjutkan instalasi python versi tersebut? (Y/N)"
     if ($PesanSistem.ToLower() -eq 'y') {
 
         # Melakukan instalasi Python
         Get-InstallPython
 
-        Write-Host "
-        Python $TargetVersiPython sudah terinstall pada system global anda,
-        kita lanjutkan menginstall lingkungan virtual.
-        Mohon tunggu beberapa saat hingga proses selesai ...
+        Write-Host "Python $TargetVersiPython sudah terinstall pada system global anda, kita lanjutkan menginstall lingkungan virtual. Mohon tunggu beberapa saat hingga proses selesai ...
         "
     }
     else
     {
-        Write-Host "
-        Silahkan menginstall versi python $TargetVersiPython pada sistem global anda,
-        secara manual dan dilanjutkan dengan pengaturan lingkungan virtual.
-        "
+        Write-Host "Silahkan menginstall versi python $TargetVersiPython pada sistem global anda, secara manual dan dilanjutkan dengan pengaturan lingkungan virtual."
 		Read-Host "Tekan Enter untuk keluar..."
         exit
     }
@@ -141,8 +129,7 @@ else
 Get-SetupVenv
 
 # Mengaktifkan lingkungan virtual
-.\venvrh311\Scripts\activate
-
+.\venv\Scripts\activate
 
 #======================================================================
 Write-Host "
@@ -156,11 +143,41 @@ Berikut daftar independensi/ pustaka/ framework yang berhasil diinstall pada lin
 "
 pip list
 
+Read-Host "
+
+Selanjutnya kita akan mempersiapkan server web berbasiskan Django Framework
+Tekan Enter untuk melanjutkan...
+
+"
+
+
+#======================================================================
+# Membuat proyek Django
+django-admin startproject air .
+
+# Menyalin templates konfigurasi proyek (air)
+Copy-Item -Path "$PathInduk\.etc\*" -Destination "$PathInduk\air" -Recurse -Force
+
+python manage.py collectstatic --noinput
+python manage.py makemigrations --noinput
+python manage.py migrate --noinput
+
+
+# Test server Django
+$InputUser = Read-Host "
+
+Pilih Y untuk test server Django anda "
+if ($InputUser.ToLower() -eq 'y') {
+    Start-Job -ScriptBlock { python manage.py runserver }
+    Start-Sleep -Seconds 5
+    Start-Process "http://127.0.0.1:8000"
+}
+
 
 #======================================================================
 Write-Host "
 
-Selamat, anda sukses melakukan pengaturan lingkungan virtual...
+Selamat, anda sukses melakukan pengaturan lingkungan web apps anda...
 Selamat bekerja dan jangan lupa bahagia
 salam sukses
 AIrsan."

@@ -303,15 +303,15 @@ $PathSumberIcon = "$PathSalinIcon\.airicon"
 
 # Mendefinisikan nama folder dan ikon yang sesuai
 $DirIcon = @{
-    "Project_$inisialProyek" = Join-Path $PathSumberIcon "air_01.ico"
-    "01_Diproses" = Join-Path $PathSumberIcon "01.ico"
-    "02_Dibagikan" = Join-Path $PathSumberIcon "02.ico"
-    "03_Diarsipkan" = Join-Path $PathSumberIcon "03.ico"
-    "04_Diterbitkan" = Join-Path $PathSumberIcon "04.ico"
-    "01_Pengembangan" = Join-Path $PathSumberIcon "01.ico"
-    "02_Pengujian" = Join-Path $PathSumberIcon "02.ico"
-    "03_Pengarsipan" = Join-Path $PathSumberIcon "03.ico"
-    "04_Produksi" = Join-Path $PathSumberIcon "04.ico"
+    "Project_$inisialProyek" = Join-Path $PathSumberIcon "AIr_Logo_01.ico"
+    "01_Diproses" = Join-Path $PathSumberIcon "DC_Diproses_01.ico"
+    "02_Dibagikan" = Join-Path $PathSumberIcon "DC_Dibagikan_01.ico"
+    "03_Diarsipkan" = Join-Path $PathSumberIcon "DC_Diarsipkan_01.ico"
+    "04_Diterbitkan" = Join-Path $PathSumberIcon "DC_Diterbitkan_01.ico"
+    "01_Pengembangan" = Join-Path $PathSumberIcon "WB_Pengembangan_01.ico"
+    "02_Pengujian" = Join-Path $PathSumberIcon "WB_Pengujian_01.ico"
+    "03_Pengarsipan" = Join-Path $PathSumberIcon "WB_Pengarsipan_01.ico"
+    "04_Produksi" = Join-Path $PathSumberIcon "WB_Produksi_01.ico"
 }
 
 # Fungsi untuk mengganti ikon folder

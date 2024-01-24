@@ -294,7 +294,7 @@ cd .\$NamaDir
 ls
 
 Write-Host "
-Mohon ditunggu hingga instalasi selesai ..."
+Mohon ditunggu hingga proses pengaturan selesai ..."
 
 
 #======================================================================

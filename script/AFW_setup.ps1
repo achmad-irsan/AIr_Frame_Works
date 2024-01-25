@@ -48,6 +48,7 @@ catch {
 }
 
 
+
 #======================================================================
 # Cek path temporari untuk menyimpan hasil unduhan atau membuat folder .temp baru
 if (-not (Test-Path "C:\.temp")) {
@@ -364,8 +365,54 @@ Remove-Item -Path "C:\.temp" -Recurse -Force
 #======================================================================
 Write-Host "
 Selamat, anda sukses melakukan pengaturan direktori kerja...
+
+"
+
+Write-Host "
+Proses pemeriksaan instalasi Powershell 7...
+
+"
+
+
+#======================================================================
+# Pengaturan instalasi Poweshell 7
+function Get-Pwsh7 {
+    # Tentukan URL installer Powershell 7
+    $UrlInstallerPwsh7 = "https://github.com/PowerShell/PowerShell/releases/download/v7.4.1/PowerShell-7.4.1-win-x64.msi"
+
+    # Tentukan lokasi tempat menyimpan file installer
+    $PathInstallerPwsh7 = "C:\.temp\PowerShell-7.4.1-win-x64.msi"
+
+    # Unduh installer
+    Invoke-WebRequest -Uri $UrlInstallerPwsh7 -OutFile $PathInstallerPwsh7 -ErrorAction SilentlyContinue
+
+    # Jalankan installer
+    Start-Process $PathInstallerPwsh7
+}
+
+
+#======================================================================
+# Cek apakah versi Powershell min. v.7 sudah terinstall
+$PSVersionTable.PSVersion
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    Write-Host "
+Powershell 7, belum terinstal pada sistem global anda,
+Instalasi Powershell 7 merupakan mandatory untuk kemudahan proses selanjutnya.
+Silahkan menunggu beberapa saat, hingga proses instalasi selsai ...
+
+"
+    Get-Pwsh7
+
+} else {
+    Write-Host "
+PowerShell 7 sudah terinstal pada sistem global anda.
 Selamat bekerja dan jangan lupa bahagia
 salam sukses
-AIrsan."
+AIrsan.
+
+"
+}
+
 Read-Host "
-Tekan Enter untuk keluar..."
+Tekan Enter untuk mengakhiri sesi..."
+#======================================================================
